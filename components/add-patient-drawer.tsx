@@ -213,14 +213,14 @@ export function AddPatientDrawer() {
   }
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm() }}>
+    <Sheet open={open} onOpenChange={(v) => { if (v) setOpen(true) }}>
       <SheetTrigger asChild>
         <Button className="gap-2">
           <PlusIcon className="size-4" />
           Add Patient
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-3xl overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:max-w-3xl overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
         <SheetHeader className="mb-6">
           <SheetTitle className="flex items-center gap-2">
             <BabyIcon className="size-5 text-primary" />
@@ -394,11 +394,9 @@ export function AddPatientDrawer() {
           )}
 
           <SheetFooter className="pt-2">
-            <SheetClose asChild>
-              <Button type="button" variant="outline">
-                Cancel
-              </Button>
-            </SheetClose>
+            <Button type="button" variant="outline" onClick={() => { setOpen(false); resetForm() }}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={submitting || loading} className="gap-2">
               {submitting && <Loader2Icon className="size-4 animate-spin" />}
               {submitting ? "Creating..." : "Create Patient"}
