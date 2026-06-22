@@ -12,16 +12,39 @@ export async function GET() {
         code: true,
         ward: { select: { name: true } },
         status: true,
+        admissions: {
+          where: { dischargedAt: null },
+          select: { id: true },
+        },
       },
       orderBy: { code: "asc" },
     });
+
+    // Auto-heal: if status in DB is out of sync with actual active admissions, fix it
+    const toFix = incubators.filter((inc) => {
+      const hasActive = inc.admissions.length > 0;
+      return (hasActive && inc.status === "AVAILABLE") ||
+             (!hasActive && inc.status === "OCCUPIED");
+    });
+
+    if (toFix.length > 0) {
+      await Promise.all(
+        toFix.map((inc) =>
+          prisma.incubator.update({
+            where: { id: inc.id },
+            data: { status: inc.admissions.length > 0 ? "OCCUPIED" : "AVAILABLE" },
+          })
+        )
+      );
+    }
 
     return NextResponse.json(
       incubators.map((incubator) => ({
         id: incubator.id,
         code: incubator.code,
         ward: incubator.ward.name,
-        status: incubator.status,
+        // Use real computed status, not the potentially stale DB value
+        status: incubator.admissions.length > 0 ? "OCCUPIED" : incubator.status,
       }))
     );
   } catch (error) {
