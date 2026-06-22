@@ -213,7 +213,7 @@ export function AddPatientDrawer() {
   }
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { if (v) setOpen(true) }}>
+    <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm() }}>
       <SheetTrigger asChild>
         <Button className="gap-2">
           <PlusIcon className="size-4" />
