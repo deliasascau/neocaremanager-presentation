@@ -43,7 +43,9 @@ interface PatientData {
       ward: string | null
       temperature: number | null
       humidity: number | null
-      oxygenLevel: number | null      alerts: { id: string; message: string; type: string; priority: string }[]    } | null
+      oxygenLevel: number | null
+      alerts: { id: string; message: string; type: string; priority: string }[]
+    } | null
   } | null
 }
 
