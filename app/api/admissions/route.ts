@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 
@@ -45,6 +46,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const activeIncubatorAdmission = await prisma.admission.findFirst({
+      where: { incubatorId, dischargedAt: null },
+    });
+    if (activeIncubatorAdmission) {
+      return NextResponse.json(
+        { error: "Incubator already has an active admission." },
+        { status: 409 }
+      );
+    }
+
     // Create admission + mark incubator as OCCUPIED in a transaction
     const admission = await prisma.$transaction(async (tx) => {
       const adm = await tx.admission.create({
@@ -79,6 +90,12 @@ export async function POST(request: NextRequest) {
     }
     if (error instanceof Error && error.message === "Forbidden") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return NextResponse.json(
+        { error: "Active admission already exists for this patient or incubator." },
+        { status: 409 }
+      );
     }
     console.error("Admit patient error:", error);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

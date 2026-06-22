@@ -10,13 +10,20 @@ export async function GET() {
       select: {
         id: true,
         code: true,
-        ward: true,
+        ward: { select: { name: true } },
         status: true,
       },
       orderBy: { code: "asc" },
     });
 
-    return NextResponse.json(incubators);
+    return NextResponse.json(
+      incubators.map((incubator) => ({
+        id: incubator.id,
+        code: incubator.code,
+        ward: incubator.ward.name,
+        status: incubator.status,
+      }))
+    );
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

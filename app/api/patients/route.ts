@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 import { encrypt } from "@/lib/encryption";
+import {
+  ALLOWED_BLOOD_TYPES,
+  ALLOWED_GENDERS,
+  isBirthWeightInRange,
+  isOptionalEnumValue,
+  parseOptionalBirthWeight,
+} from "@/lib/medical-constraints";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +24,24 @@ export async function POST(request: NextRequest) {
         { error: "firstName, lastName, birthDate, motherId, and doctorId are required." },
         { status: 400 }
       );
+    }
+
+    const parsedBirthDate = new Date(birthDate);
+    if (Number.isNaN(parsedBirthDate.getTime())) {
+      return NextResponse.json({ error: "birthDate must be a valid date." }, { status: 400 });
+    }
+
+    if (!isOptionalEnumValue(gender, ALLOWED_GENDERS)) {
+      return NextResponse.json({ error: "gender must be Male or Female." }, { status: 400 });
+    }
+
+    if (!isOptionalEnumValue(bloodType, ALLOWED_BLOOD_TYPES)) {
+      return NextResponse.json({ error: "bloodType is not valid." }, { status: 400 });
+    }
+
+    const parsedBirthWeight = parseOptionalBirthWeight(birthWeight);
+    if (Number.isNaN(parsedBirthWeight) || !isBirthWeightInRange(parsedBirthWeight)) {
+      return NextResponse.json({ error: "birthWeight must be between 0.5 and 6 kg." }, { status: 400 });
     }
 
     // Verify mother exists
@@ -35,10 +60,10 @@ export async function POST(request: NextRequest) {
       data: {
         firstName: encrypt(firstName.trim()),
         lastName: encrypt(lastName.trim()),
-        birthDate: new Date(birthDate),
+        birthDate: parsedBirthDate,
         gender: gender || null,
         bloodType: bloodType || null,
-        birthWeight: birthWeight ? parseFloat(birthWeight) : null,
+        birthWeight: parsedBirthWeight,
         motherId,
         doctorId,
       },

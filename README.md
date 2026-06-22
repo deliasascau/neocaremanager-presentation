@@ -10,6 +10,10 @@ Neocare Manager este o aplicație Next.js pentru gestionarea pacienților nou-n�
 - Autentificare cu JWT în cookie HTTP-only
 - Criptare AES-256-GCM pentru datele personale ale pacienților
 
+## Baza de date
+
+Normalizarea, constrângerile și relațiile pentru diagrama ER sunt documentate în [`DATABASE_NORMALIZATION.md`](DATABASE_NORMALIZATION.md).
+
 ## Setup local
 
 1. Instalează dependențele:

@@ -17,7 +17,7 @@ export async function GET(
         incubator: {
           select: {
             code: true,
-            ward: true,
+            ward: { select: { name: true } },
             status: true,
             temperature: true,
             humidity: true,
@@ -38,7 +38,14 @@ export async function GET(
       priority: alert.priority,
       resolved: alert.resolved,
       createdAt: alert.createdAt.toISOString(),
-      incubator: alert.incubator,
+      incubator: {
+        code: alert.incubator.code,
+        ward: alert.incubator.ward.name,
+        status: alert.incubator.status,
+        temperature: alert.incubator.temperature,
+        humidity: alert.incubator.humidity,
+        oxygenLevel: alert.incubator.oxygenLevel,
+      },
     });
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {

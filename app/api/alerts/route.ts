@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
+import {
+  ALLOWED_ALERT_PRIORITIES,
+  ALLOWED_ALERT_TYPES,
+  isEnumValue,
+} from "@/lib/medical-constraints";
 
 export async function GET() {
   try {
@@ -50,6 +55,14 @@ export async function POST(request: NextRequest) {
         { error: "incubatorId, message, type, and priority are required." },
         { status: 400 }
       );
+    }
+
+    if (!isEnumValue(type, ALLOWED_ALERT_TYPES)) {
+      return NextResponse.json({ error: "type is not valid." }, { status: 400 });
+    }
+
+    if (!isEnumValue(priority, ALLOWED_ALERT_PRIORITIES)) {
+      return NextResponse.json({ error: "priority is not valid." }, { status: 400 });
     }
 
     const incubator = await prisma.incubator.findUnique({ where: { id: incubatorId } });

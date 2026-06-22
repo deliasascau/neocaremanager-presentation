@@ -50,11 +50,11 @@ model Doctor {
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   specialty     String?
-  licenseNumber String?
+  licenseNumber String?  @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  patients  Patient[]    @relation("DoctorPatients")
+  patients   Patient[]   @relation("DoctorPatients")
   assistants Assistant[]
 }
 
@@ -106,10 +106,20 @@ model Patient {
 
 // ─── Incubator ───────────────────────────────────────
 
+model Ward {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  incubators Incubator[]
+}
+
 model Incubator {
   id          String          @id @default(cuid())
   code        String          @unique
-  ward        String
+  wardId      String
+  ward        Ward            @relation(fields: [wardId], references: [id])
   status      IncubatorStatus @default(AVAILABLE)
   temperature Float?
   humidity    Float?
@@ -119,6 +129,8 @@ model Incubator {
 
   admissions Admission[]
   alerts     Alert[]
+
+  @@index([wardId])
 }
 
 // ─── Admission ───────────────────────────────────────
@@ -134,6 +146,9 @@ model Admission {
   notes        String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+
+  @@index([patientId])
+  @@index([incubatorId])
 }
 
 // ─── Alert ───────────────────────────────────────────
@@ -148,4 +163,6 @@ model Alert {
   resolved    Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([incubatorId])
 }

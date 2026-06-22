@@ -14,7 +14,7 @@ export async function GET() {
           select: { firstName: true, lastName: true },
         },
         incubator: {
-          select: { code: true, ward: true },
+          select: { code: true, ward: { select: { name: true } } },
         },
       },
       orderBy: { admittedAt: "desc" },
@@ -27,7 +27,7 @@ export async function GET() {
         admissionId: a.id,
         newborn: `${decrypted.firstName} ${decrypted.lastName}`,
         incubatorId: a.incubator.code,
-        ward: a.incubator.ward,
+        ward: a.incubator.ward.name,
         admittedDate: a.admittedAt.toISOString().split("T")[0],
       };
     });

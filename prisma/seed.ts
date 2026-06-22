@@ -30,6 +30,7 @@ async function main() {
   await prisma.admission.deleteMany();
   await prisma.patient.deleteMany();
   await prisma.incubator.deleteMany();
+  await prisma.ward.deleteMany();
   await prisma.assistant.deleteMany();
   await prisma.doctor.deleteMany();
   await prisma.mother.deleteMany();
@@ -177,13 +178,23 @@ async function main() {
     { code: "INC-020", ward: "Isolation Room" },
   ];
 
-  const incubators: { id: string; code: string; ward: string }[] = [];
+  const wards = new Map<string, string>();
+  for (const name of Array.from(new Set(incubatorDefs.map((inc) => inc.ward)))) {
+    const ward = await prisma.ward.create({ data: { name } });
+    wards.set(name, ward.id);
+  }
+  console.log(`🏥 ${wards.size} wards created`);
+
+  const incubators: { id: string; code: string; wardId: string }[] = [];
 
   for (const inc of incubatorDefs) {
+    const wardId = wards.get(inc.ward);
+    if (!wardId) throw new Error(`Missing ward for ${inc.code}`);
+
     const created = await prisma.incubator.create({
       data: {
         code: inc.code,
-        ward: inc.ward,
+        wardId,
         status: IncubatorStatus.AVAILABLE,
         temperature: parseFloat(rand(36.2, 37.0).toFixed(1)),
         humidity: parseFloat(rand(55, 70).toFixed(1)),

@@ -33,7 +33,7 @@ export async function GET(
                 incubator: {
                   select: {
                     code: true,
-                    ward: true,
+                    ward: { select: { name: true } },
                     temperature: true,
                     humidity: true,
                     oxygenLevel: true,
@@ -86,11 +86,11 @@ export async function GET(
           notes: string | null;
           incubator: {
             code: string;
-            ward: string;
+            ward: { name: string };
             temperature: number | null;
             humidity: number | null;
             oxygenLevel: number | null;
-          } | null;
+          };
         }[];
       }) => {
         const decrypted = decryptPatient(p);
@@ -112,7 +112,13 @@ export async function GET(
             ? {
                 admittedAt: p.admissions[0].admittedAt,
                 notes: p.admissions[0].notes,
-                incubator: p.admissions[0].incubator,
+                incubator: {
+                  code: p.admissions[0].incubator.code,
+                  ward: p.admissions[0].incubator.ward.name,
+                  temperature: p.admissions[0].incubator.temperature,
+                  humidity: p.admissions[0].incubator.humidity,
+                  oxygenLevel: p.admissions[0].incubator.oxygenLevel,
+                },
               }
             : null,
         };

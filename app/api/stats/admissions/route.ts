@@ -14,7 +14,7 @@ export async function GET() {
       where: { admittedAt: { gte: startDate } },
       select: {
         admittedAt: true,
-        incubator: { select: { ward: true } },
+        incubator: { select: { ward: { select: { name: true } } } },
       },
       orderBy: { admittedAt: "asc" },
     });
@@ -33,7 +33,7 @@ export async function GET() {
       const row = byDate.get(key);
       if (!row) continue;
 
-      if (admission.incubator.ward.toLowerCase().includes("intermediate")) {
+      if (admission.incubator.ward.name.toLowerCase().includes("intermediate")) {
         row.intermediate += 1;
       } else {
         row.nicu += 1;

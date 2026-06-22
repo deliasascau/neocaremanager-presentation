@@ -35,7 +35,13 @@ export default async function PatientDetailPage({
       admissions: {
         include: {
           incubator: {
-            select: { code: true, ward: true, temperature: true, humidity: true, oxygenLevel: true },
+            select: {
+              code: true,
+              ward: { select: { name: true } },
+              temperature: true,
+              humidity: true,
+              oxygenLevel: true,
+            },
           },
         },
         orderBy: { admittedAt: "desc" },
@@ -77,7 +83,13 @@ export default async function PatientDetailPage({
       admittedAt: a.admittedAt.toISOString(),
       dischargedAt: a.dischargedAt?.toISOString() ?? null,
       notes: a.notes,
-      incubator: a.incubator,
+      incubator: {
+        code: a.incubator.code,
+        ward: a.incubator.ward.name,
+        temperature: a.incubator.temperature,
+        humidity: a.incubator.humidity,
+        oxygenLevel: a.incubator.oxygenLevel,
+      },
     })),
   };
 

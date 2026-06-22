@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
 import { decryptPatient, encrypt } from "@/lib/encryption";
+import {
+  ALLOWED_BLOOD_TYPES,
+  ALLOWED_GENDERS,
+  isBirthWeightInRange,
+  isOptionalEnumValue,
+  parseOptionalBirthWeight,
+} from "@/lib/medical-constraints";
 
 export async function GET(
   _request: NextRequest,
@@ -33,7 +40,13 @@ export async function GET(
         admissions: {
           include: {
             incubator: {
-              select: { code: true, ward: true, temperature: true, humidity: true, oxygenLevel: true },
+              select: {
+                code: true,
+                ward: { select: { name: true } },
+                temperature: true,
+                humidity: true,
+                oxygenLevel: true,
+              },
             },
           },
           orderBy: { admittedAt: "desc" },
@@ -77,7 +90,13 @@ export async function GET(
         admittedAt: a.admittedAt,
         dischargedAt: a.dischargedAt,
         notes: a.notes,
-        incubator: a.incubator,
+        incubator: {
+          code: a.incubator.code,
+          ward: a.incubator.ward.name,
+          temperature: a.incubator.temperature,
+          humidity: a.incubator.humidity,
+          oxygenLevel: a.incubator.oxygenLevel,
+        },
       })),
     });
   } catch (error) {
@@ -111,10 +130,32 @@ export async function PATCH(
     const data: Record<string, unknown> = {};
     if (firstName !== undefined) data.firstName = encrypt(firstName.trim());
     if (lastName !== undefined) data.lastName = encrypt(lastName.trim());
-    if (birthDate !== undefined) data.birthDate = new Date(birthDate);
-    if (gender !== undefined) data.gender = gender || null;
-    if (bloodType !== undefined) data.bloodType = bloodType || null;
-    if (birthWeight !== undefined) data.birthWeight = birthWeight ? parseFloat(birthWeight) : null;
+    if (birthDate !== undefined) {
+      const parsedBirthDate = new Date(birthDate);
+      if (Number.isNaN(parsedBirthDate.getTime())) {
+        return NextResponse.json({ error: "birthDate must be a valid date." }, { status: 400 });
+      }
+      data.birthDate = parsedBirthDate;
+    }
+    if (gender !== undefined) {
+      if (!isOptionalEnumValue(gender, ALLOWED_GENDERS)) {
+        return NextResponse.json({ error: "gender must be Male or Female." }, { status: 400 });
+      }
+      data.gender = gender || null;
+    }
+    if (bloodType !== undefined) {
+      if (!isOptionalEnumValue(bloodType, ALLOWED_BLOOD_TYPES)) {
+        return NextResponse.json({ error: "bloodType is not valid." }, { status: 400 });
+      }
+      data.bloodType = bloodType || null;
+    }
+    if (birthWeight !== undefined) {
+      const parsedBirthWeight = parseOptionalBirthWeight(birthWeight);
+      if (Number.isNaN(parsedBirthWeight) || !isBirthWeightInRange(parsedBirthWeight)) {
+        return NextResponse.json({ error: "birthWeight must be between 0.5 and 6 kg." }, { status: 400 });
+      }
+      data.birthWeight = parsedBirthWeight;
+    }
     if (doctorId !== undefined) data.doctorId = doctorId || null;
 
     const updated = await prisma.patient.update({
