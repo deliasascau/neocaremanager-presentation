@@ -215,14 +215,14 @@ export function ChartAreaInteractive() {
             />
             <Area
               dataKey="intermediate"
-              type="linear"
+              type="monotone"
               fill="url(#fillIntermediate)"
               stroke="var(--color-intermediate)"
               stackId="a"
             />
             <Area
               dataKey="nicu"
-              type="linear"
+              type="monotone"
               fill="url(#fillNicu)"
               stroke="var(--color-nicu)"
               stackId="a"

@@ -18,14 +18,12 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
-  const [resetUrl, setResetUrl] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
     setMessage(null)
-    setResetUrl(null)
     setIsSubmitting(true)
 
     try {
@@ -42,7 +40,6 @@ export default function ForgotPasswordPage() {
       }
 
       setMessage(data.message || "Reset link generated.")
-      setResetUrl(data.resetUrl || null)
     } catch {
       setError("Something went wrong. Please try again.")
     } finally {
@@ -68,7 +65,8 @@ export default function ForgotPasswordPage() {
             </div>
             <h1 className="text-3xl font-semibold tracking-tighter">Reset your password</h1>
             <p className="text-sm leading-6 text-muted-foreground">
-              Enter your account email and the app will generate a reset link.
+              Enter your account email. An administrator will review the request and
+              provide you with a reset link.
             </p>
           </div>
 
@@ -80,11 +78,6 @@ export default function ForgotPasswordPage() {
                   <CheckCircle2Icon className="size-4 text-primary" />
                   {message}
                 </div>
-                {resetUrl ? (
-                  <Button asChild className="mt-3 w-full">
-                    <Link href={resetUrl}>Open reset page</Link>
-                  </Button>
-                ) : null}
               </div>
             ) : null}
 
@@ -101,12 +94,12 @@ export default function ForgotPasswordPage() {
                 className="bg-background"
               />
               <FieldDescription>
-                For the presentation build, the reset link is shown here instead of being emailed.
+                For the presentation build, reset requests appear in the admin&apos;s Pending Approvals panel.
               </FieldDescription>
             </Field>
 
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Generating..." : "Generate reset link"}
+              {isSubmitting ? "Submitting..." : "Request password reset"}
             </Button>
           </form>
         </FieldGroup>
