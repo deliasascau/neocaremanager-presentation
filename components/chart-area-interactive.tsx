@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -36,6 +36,19 @@ interface ChartDataPoint {
   date: string
   nicu: number
   intermediate: number
+}
+
+function toDateKey(date: Date) {
+  return date.toISOString().split("T")[0]
+}
+
+function toWeekKey(value: string) {
+  const date = new Date(value)
+  const day = date.getDay()
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1)
+  date.setDate(diff)
+  date.setHours(0, 0, 0, 0)
+  return toDateKey(date)
 }
 
 const chartConfig = {
@@ -91,6 +104,21 @@ export function ChartAreaInteractive() {
     return filteredData.reduce((acc, curr) => acc + curr.nicu + curr.intermediate, 0)
   }, [filteredData])
 
+  const displayData = React.useMemo(() => {
+    if (timeRange !== "90d") return filteredData
+
+    const byWeek = new Map<string, ChartDataPoint>()
+    for (const item of filteredData) {
+      const week = toWeekKey(item.date)
+      const existing = byWeek.get(week) ?? { date: week, nicu: 0, intermediate: 0 }
+      existing.nicu += item.nicu
+      existing.intermediate += item.intermediate
+      byWeek.set(week, existing)
+    }
+
+    return Array.from(byWeek.values())
+  }, [filteredData, timeRange])
+
   return (
     <Card className="@container/card">
       <CardHeader>
@@ -137,7 +165,7 @@ export function ChartAreaInteractive() {
           config={chartConfig}
           className="aspect-auto h-[300px] w-full"
         >
-          <AreaChart data={filteredData}>
+          <AreaChart data={displayData}>
             <defs>
               <linearGradient id="fillNicu" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--color-nicu)" stopOpacity={0.8} />
@@ -163,6 +191,14 @@ export function ChartAreaInteractive() {
                 })
               }}
             />
+            <YAxis
+              allowDecimals={false}
+              axisLine={false}
+              tickLine={false}
+              tickMargin={8}
+              width={28}
+              domain={[0, (dataMax: number) => Math.max(3, dataMax)]}
+            />
             <ChartTooltip
               cursor={false}
               content={
@@ -179,14 +215,14 @@ export function ChartAreaInteractive() {
             />
             <Area
               dataKey="intermediate"
-              type="natural"
+              type="linear"
               fill="url(#fillIntermediate)"
               stroke="var(--color-intermediate)"
               stackId="a"
             />
             <Area
               dataKey="nicu"
-              type="natural"
+              type="linear"
               fill="url(#fillNicu)"
               stroke="var(--color-nicu)"
               stackId="a"

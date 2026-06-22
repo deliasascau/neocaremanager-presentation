@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { ChevronRightIcon, StethoscopeIcon, UserRoundIcon } from "lucide-react"
 import { Collapsible } from "radix-ui"
 import {
@@ -33,7 +33,6 @@ interface Doctor {
 export function NavTeams() {
   const [teams, setTeams] = useState<Doctor[]>([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
     async function fetchTeams() {
@@ -82,7 +81,6 @@ export function NavTeams() {
               <Collapsible.Trigger asChild>
                 <SidebarMenuButton
                   tooltip={doctor.name}
-                  onClick={() => router.push(`/dashboard/doctors/${doctor.id}`)}
                 >
                   <StethoscopeIcon className="size-4" />
                   <span className="truncate">{doctor.name}</span>
@@ -96,6 +94,14 @@ export function NavTeams() {
               </Collapsible.Trigger>
               <Collapsible.Content>
                 <SidebarMenuSub>
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton asChild>
+                      <Link href={`/dashboard/doctors/${doctor.id}`}>
+                        <StethoscopeIcon className="size-3.5" />
+                        <span className="truncate">View doctor profile</span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
                   {doctor.assistants.length === 0 ? (
                     <SidebarMenuSubItem>
                       <span className="flex items-center gap-2 px-2 py-1 text-xs text-muted-foreground">
@@ -105,11 +111,9 @@ export function NavTeams() {
                   ) : (
                     doctor.assistants.map((assistant) => (
                       <SidebarMenuSubItem key={assistant.id}>
-                        <SidebarMenuSubButton asChild>
-                          <a href="#">
+                        <SidebarMenuSubButton>
                             <UserRoundIcon className="size-3.5" />
                             <span className="truncate">{assistant.name}</span>
-                          </a>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))
