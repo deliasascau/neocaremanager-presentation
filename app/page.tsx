@@ -23,9 +23,6 @@ export default function Home() {
         <Link href="/" className="text-lg font-semibold tracking-tight">
           Neocare Manager
         </Link>
-        <Button asChild variant="outline" className="bg-white">
-          <Link href="/auth/login">Autentificare</Link>
-        </Button>
       </motion.nav>
 
       <section className="mx-auto flex min-h-[calc(100svh-6rem)] max-w-3xl flex-col items-center justify-center py-10 text-center">
