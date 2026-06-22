@@ -107,6 +107,8 @@ export function ChartAreaInteractive() {
       const week = toWeekKey(item.date)
       const existing = byWeek.get(week) ?? { date: week, admissions: 0 }
       existing.admissions += item.admissions
+      byWeek.set(week, existing)
+    }
     return Array.from(byWeek.values())
   }, [filteredData, timeRange])
 
