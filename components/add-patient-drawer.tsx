@@ -359,7 +359,7 @@ export function AddPatientDrawer() {
                 <SelectTrigger id="incubator" className="w-full">
                   <SelectValue placeholder={loading ? "Loading..." : "Select incubator"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" className="max-h-60 overflow-y-auto">
                   {incubators.map((inc) => (
                     <SelectItem key={inc.id} value={inc.id} disabled={inc.status !== "AVAILABLE"}>
                       {inc.code} — {inc.ward} ({inc.status})

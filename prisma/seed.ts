@@ -176,6 +176,16 @@ async function main() {
     { code: "INC-018", ward: "Step-Down Unit" },
     { code: "INC-019", ward: "Isolation Room" },
     { code: "INC-020", ward: "Isolation Room" },
+    { code: "INC-021", ward: "NICU Zone A" },
+    { code: "INC-022", ward: "NICU Zone A" },
+    { code: "INC-023", ward: "NICU Zone B" },
+    { code: "INC-024", ward: "NICU Zone B" },
+    { code: "INC-025", ward: "Intermediate Care" },
+    { code: "INC-026", ward: "Intermediate Care" },
+    { code: "INC-027", ward: "Step-Down Unit" },
+    { code: "INC-028", ward: "Step-Down Unit" },
+    { code: "INC-029", ward: "Isolation Room" },
+    { code: "INC-030", ward: "Isolation Room" },
   ];
 
   const wards = new Map<string, string>();
