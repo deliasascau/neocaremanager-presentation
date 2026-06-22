@@ -14,30 +14,24 @@ export async function GET() {
       where: { admittedAt: { gte: startDate } },
       select: {
         admittedAt: true,
-        incubator: { select: { ward: { select: { name: true } } } },
       },
       orderBy: { admittedAt: "asc" },
     });
 
-    const byDate = new Map<string, { date: string; nicu: number; intermediate: number }>();
+    const byDate = new Map<string, { date: string; admissions: number }>();
 
     for (let i = 0; i < 90; i++) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + i);
       const key = date.toISOString().split("T")[0];
-      byDate.set(key, { date: key, nicu: 0, intermediate: 0 });
+      byDate.set(key, { date: key, admissions: 0 });
     }
 
     for (const admission of admissions) {
       const key = admission.admittedAt.toISOString().split("T")[0];
       const row = byDate.get(key);
       if (!row) continue;
-
-      if (admission.incubator.ward.name.toLowerCase().includes("intermediate")) {
-        row.intermediate += 1;
-      } else {
-        row.nicu += 1;
-      }
+      row.admissions += 1;
     }
 
     return NextResponse.json({
