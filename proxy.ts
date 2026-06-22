@@ -8,7 +8,12 @@ const JWT_SECRET = new TextEncoder().encode(
 const COOKIE_NAME = "neocare-token";
 
 const PUBLIC_PATHS = ["/auth/login", "/auth/register", "/login"];
-const API_PUBLIC_PATHS = ["/api/auth/login", "/api/auth/register"];
+const API_PUBLIC_PATHS = [
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+];
 const PENDING_ALLOWED = ["/pending", "/api/auth/logout", "/api/auth/me"];
 
 async function verifyAuth(token: string) {
