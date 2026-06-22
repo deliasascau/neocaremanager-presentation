@@ -1,0 +1,76 @@
+{
+  "activeAdmissions": [
+    {
+      "id": 1,
+      "newborn": "Baby Sophia (Lucas)",
+      "incubatorId": "INC-084",
+      "ward": "NICU Zone A",
+      "admittedDate": "2026-06-18"
+    },
+    {
+      "id": 2,
+      "newborn": "Baby Liam (Smith)",
+      "incubatorId": "INC-102",
+      "ward": "NICU Zone B",
+      "admittedDate": "2026-06-19"
+    },
+    {
+      "id": 3,
+      "newborn": "Baby Olivia (Johnson)",
+      "incubatorId": "INC-055",
+      "ward": "Intermediate Care",
+      "admittedDate": "2026-06-15"
+    },
+    {
+      "id": 4,
+      "newborn": "Baby Noah (Davis)",
+      "incubatorId": "INC-120",
+      "ward": "NICU Zone A",
+      "admittedDate": "2026-06-20"
+    },
+    {
+      "id": 5,
+      "newborn": "Baby Emma (Brown)",
+      "incubatorId": "INC-041",
+      "ward": "Intermediate Care",
+      "admittedDate": "2026-06-17"
+    }
+  ],
+  "unsolvedAlerts": [
+    {
+      "id": 1,
+      "message": "SpO2 drop below 90% detected",
+      "type": "Oxygen",
+      "priority": "Critical",
+      "time": "10:42 AM"
+    },
+    {
+      "id": 2,
+      "message": "Temperature fluctuation exceeding ±0.5°C",
+      "type": "Temperature",
+      "priority": "High",
+      "time": "10:38 AM"
+    },
+    {
+      "id": 3,
+      "message": "Apnea sensor alarm triggered",
+      "type": "Respiration",
+      "priority": "Critical",
+      "time": "10:25 AM"
+    },
+    {
+      "id": 4,
+      "message": "Power disruption warning - backup battery active",
+      "type": "System",
+      "priority": "Medium",
+      "time": "09:50 AM"
+    },
+    {
+      "id": 5,
+      "message": "Heart rate variability outside safety bounds",
+      "type": "Cardiac",
+      "priority": "High",
+      "time": "09:15 AM"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────
+
+enum Role {
+  PENDING
+  ADMIN
+  DOCTOR
+  ASSISTANT
+  MOTHER
+}
+
+enum IncubatorStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+// ─── User (base entity for all roles) ────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctor    Doctor?
+  assistant Assistant?
+  mother    Mother?
+}
+
+// ─── Doctor ──────────────────────────────────────────
+
+model Doctor {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialty     String?
+  licenseNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  patients  Patient[]    @relation("DoctorPatients")
+  assistants Assistant[]
+}
+
+// ─── Assistant ───────────────────────────────────────
+
+model Assistant {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  doctorId  String?
+  doctor    Doctor?  @relation(fields: [doctorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Mother ──────────────────────────────────────────
+
+model Mother {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patients Patient[] @relation("MotherPatients")
+}
+
+// ─── Patient (newborn) ───────────────────────────────
+
+model Patient {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  birthDate   DateTime
+  gender      String?
+  bloodType   String?
+  birthWeight Float?
+  motherId    String?
+  mother      Mother?  @relation("MotherPatients", fields: [motherId], references: [id])
+  doctorId    String?
+  doctor      Doctor?  @relation("DoctorPatients", fields: [doctorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  admissions Admission[]
+}
+
+// ─── Incubator ───────────────────────────────────────
+
+model Incubator {
+  id          String          @id @default(cuid())
+  code        String          @unique
+  ward        String
+  status      IncubatorStatus @default(AVAILABLE)
+  temperature Float?
+  humidity    Float?
+  oxygenLevel Float?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  admissions Admission[]
+  alerts     Alert[]
+}
+
+// ─── Admission ───────────────────────────────────────
+
+model Admission {
+  id           String    @id @default(cuid())
+  patientId    String
+  patient      Patient   @relation(fields: [patientId], references: [id])
+  incubatorId  String
+  incubator    Incubator @relation(fields: [incubatorId], references: [id])
+  admittedAt   DateTime  @default(now())
+  dischargedAt DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ─── Alert ───────────────────────────────────────────
+
+model Alert {
+  id          String    @id @default(cuid())
+  incubatorId String
+  incubator   Incubator @relation(fields: [incubatorId], references: [id])
+  message     String
+  type        String
+  priority    String
+  resolved    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
