@@ -7,7 +7,7 @@ const JWT_SECRET = new TextEncoder().encode(
 
 const COOKIE_NAME = "neocare-token";
 
-const PUBLIC_PATHS = ["/auth/login", "/auth/register", "/login"];
+const PUBLIC_PATHS = ["/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password", "/login"];
 const API_PUBLIC_PATHS = [
   "/api/auth/login",
   "/api/auth/register",
