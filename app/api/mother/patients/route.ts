@@ -39,6 +39,11 @@ export async function GET() {
                 temperature: true,
                 humidity: true,
                 oxygenLevel: true,
+                alerts: {
+                  where: { resolved: false },
+                  select: { id: true, message: true, type: true, priority: true },
+                  orderBy: { createdAt: "desc" },
+                },
               },
             },
           },
@@ -104,6 +109,7 @@ export async function GET() {
                 temperature: p.admissions[0].incubator.temperature,
                 humidity: p.admissions[0].incubator.humidity,
                 oxygenLevel: p.admissions[0].incubator.oxygenLevel,
+                alerts: p.admissions[0].incubator.alerts,
               },
             }
           : null,

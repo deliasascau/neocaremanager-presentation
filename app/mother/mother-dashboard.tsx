@@ -14,6 +14,7 @@ import {
   WeightIcon,
   DropletsIcon,
   WindIcon,
+  AlertTriangleIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,8 +43,7 @@ interface PatientData {
       ward: string | null
       temperature: number | null
       humidity: number | null
-      oxygenLevel: number | null
-    } | null
+      oxygenLevel: number | null      alerts: { id: string; message: string; type: string; priority: string }[]    } | null
   } | null
 }
 
@@ -302,6 +302,33 @@ export function MotherDashboard() {
                           {patient.admission.notes}
                         </p>
                       )}
+                    </div>
+                  )}
+
+                  {/* Active alerts */}
+                  {patient.admission?.incubator?.alerts && patient.admission.incubator.alerts.length > 0 && (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20 p-3 mt-4 space-y-2">
+                      <p className="text-xs font-semibold text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
+                        <AlertTriangleIcon className="size-3.5" />
+                        Alerte active ({patient.admission.incubator.alerts.length})
+                      </p>
+                      {patient.admission.incubator.alerts.map((alert) => (
+                        <div key={alert.id} className="flex items-start gap-2 text-sm">
+                          <Badge
+                            variant="outline"
+                            className={`shrink-0 text-xs ${
+                              alert.priority === "Critical"
+                                ? "border-red-400 text-red-700 bg-red-50 dark:text-red-400"
+                                : alert.priority === "High"
+                                ? "border-orange-400 text-orange-700 bg-orange-50 dark:text-orange-400"
+                                : "border-amber-400 text-amber-700 bg-amber-50 dark:text-amber-400"
+                            }`}
+                          >
+                            {alert.priority}
+                          </Badge>
+                          <span className="text-amber-900 dark:text-amber-200 leading-snug">{alert.message}</span>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </CardContent>
